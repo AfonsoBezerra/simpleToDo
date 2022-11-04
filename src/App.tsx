@@ -3,6 +3,7 @@ import "./App.css";
 
 export default function App() {
   const [task, setTask] = React.useState<any>([]);
+  const  [forceRemove, setForceRemove] = React.useState(false)
   
   useEffect(() => {
     const taskLocal:any = localStorage.getItem("task")
@@ -24,8 +25,14 @@ export default function App() {
 
   function deleteTask(id:any) {
     const index = task.findIndex((e:any) => e.id === id);
+    console.log(index)
     setTask(task.filter((x:any, i:any) => i !== index));
-    setLocalStorage();
+    if(index === 0){
+      setForceRemove(true)
+    }
+    else{
+      setForceRemove(false)
+    }
   }
   function complete(id:any, value:any) {
     setTask(task.map((task:any) =>{
@@ -38,7 +45,7 @@ export default function App() {
     }))
   }
 
-  useMemo(() => {task.length ? setLocalStorage() : null }, [task])
+  useMemo(() => { task.length || forceRemove ? setLocalStorage(): null }, [task])
   
   function setLocalStorage(){
     localStorage.setItem("task", JSON.stringify(task));
@@ -52,7 +59,7 @@ export default function App() {
         <button type="submit">Add Task</button>
       </form>
       <div className="taskContainer">
-        {task.map((element:any) => (
+        {task.filter((x:any, i:any) => x.id !== 0).map((element:any) => (
           <div
             className="tasks"
             key={element.key}
